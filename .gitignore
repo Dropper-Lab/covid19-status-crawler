@@ -1,0 +1,9 @@
+.DS_Store
+venv/
+.idea/
+*.log
+src/status-data/
+__pycache__/
+non-upload/
+mail_sender.py
+mail_property.py
