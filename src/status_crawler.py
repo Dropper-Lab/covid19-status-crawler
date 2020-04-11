@@ -57,7 +57,7 @@ def insert_result(uid, data_list):
 
     for data in data_list[1:]:
         cursor.execute(
-            f"insert into status_{data['region']} values({uid}, {data_list[0]}, {data['increased']}, {data['certified']}, {data['deisolation']}, {data['dead']}, {data['percentage']});")
+            f"insert into status_{data['region']} values({uid}, {data_list[0]}, {data['increased']}, {data['increased_foreign']}, {data['increased_local']}, {data['certified']}, {data['isolation']}, {data['deisolation']}, {data['dead']}, {data['percentage']});")
         logger.info('insert_result: status_' + str(data['region']) + ' data inserted | data=' + str(data))
 
     connection.commit()
@@ -148,10 +148,13 @@ def get_status_data(target=''):
         status_data = {
             'region': region,
             'increased': int('0' + re.sub('[^0-9]', '', data[0].text)),
-            'certified': int('0' + re.sub('[^0-9]', '', data[1].text)),
-            'deisolation': int('0' + re.sub('[^0-9]', '', data[2].text)),
-            'dead': int('0' + re.sub('[^0-9]', '', data[3].text)),
-            'percentage': float('0' + re.sub('[^0-9.]', '', data[4].text))
+            'increased_foreign': int('0' + re.sub('[^0-9]', '', data[1].text)),
+            'increased_local': int('0' + re.sub('[^0-9]', '', data[2].text)),
+            'certified': int('0' + re.sub('[^0-9]', '', data[3].text)),
+            'isolation': int('0' + re.sub('[^0-9]', '', data[4].text)),
+            'deisolation': int('0' + re.sub('[^0-9]', '', data[5].text)),
+            'dead': int('0' + re.sub('[^0-9]', '', data[6].text)),
+            'percentage': float('0' + re.sub('[^0-9.]', '', data[7].text))
         }
         logger.info('get_status_data: declare status data | status_data=' + str(status_data))
 
