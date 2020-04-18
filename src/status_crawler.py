@@ -38,6 +38,7 @@ import time
 import pymysql
 
 import mysql_status_property
+import mail_sender
 
 logging.Formatter.converter = time.gmtime
 logger = logging.getLogger(__name__)
