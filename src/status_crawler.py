@@ -49,6 +49,10 @@ logger.addHandler(fileHandler)
 logger.setLevel(logging.INFO)
 logger.info('every package loaded and start logging')
 
+logger.info('mysql_status_property.hostname=' + str(mysql_status_property.hostname) + ' | mysql_status_property.user=' + str(mysql_status_property.user) + ' | mysql_status_property.password=' + str(mysql_status_property.password) + ' | mysql_status_property.database=' + str(mysql_status_property.database) + ' | mysql_status_property.charset=' + str(mysql_status_property.charset))
+logger.info('status_property.region_dictionary=' + str(status_property.region_dictionary))
+
+
 def insert_result(uid, data_list):
     logger.info('insert_result: function started')
     connection = pymysql.connect(host=mysql_status_property.hostname, user=mysql_status_property.user,
