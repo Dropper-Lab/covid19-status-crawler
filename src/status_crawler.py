@@ -38,6 +38,7 @@ import time
 import pymysql
 
 import mysql_status_property
+import status_property
 import mail_sender
 
 logging.Formatter.converter = time.gmtime
@@ -47,7 +48,6 @@ fileHandler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] [%(filen
 logger.addHandler(fileHandler)
 logger.setLevel(logging.INFO)
 logger.info('every package loaded and start logging')
-
 
 def insert_result(uid, data_list):
     logger.info('insert_result: function started')
@@ -113,28 +113,6 @@ def get_status_data(target='', current_timestamp=0):
 
     status_data_list = [announced_time_unix]
     logger.info('get_status_data: declare status_data_list | status_data_list=' + str(status_data_list))
-    region_dictionary = {
-        '합계': 'synthesize',
-        '서울': 'seoul',
-        '부산': 'busan',
-        '대구': 'daegu',
-        '인천': 'incheon',
-        '광주': 'gwangju',
-        '대전': 'daejeon',
-        '울산': 'ulsan',
-        '세종': 'sejong',
-        '경기': 'gyeonggi',
-        '강원': 'gangwon',
-        '충북': 'chungbuk',
-        '충남': 'chungnam',
-        '전북': 'jeonbuk',
-        '전남': 'jeonnam',
-        '경북': 'gyeongbuk',
-        '경남': 'gyeongnam',
-        '제주': 'jeju',
-        '검역': 'quarantine'
-    }
-    logger.info('get_status_data: declare region_dictionary | region_dictionary=' + str(region_dictionary))
 
     convert_error_list = [0]
     database_error_list = [0]
@@ -167,7 +145,7 @@ def get_status_data(target='', current_timestamp=0):
                     logger.info('get_status_data: extracting data from table data | data=' + str(data))
                     try:
                         status_data = {
-                            'region': region_dictionary[region],
+                            'region': status_property.region_dictionary[region],
                             'increased': int('0' + re.sub('[^0-9]', '', data[0].text)),
                             'increased_foreign': int('0' + re.sub('[^0-9]', '', data[1].text)),
                             'increased_local': int('0' + re.sub('[^0-9]', '', data[2].text)),
