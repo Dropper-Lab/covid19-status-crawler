@@ -9,3 +9,7 @@ The status data crawler for COVID19API from Dropper-Lab. with python (Data from 
 ### v1.0.1
 - Add error handling feature.
 - Add task report mailing feature.
+
+### v1.0.2
+- Load dictionary from separate file.
+- Log separate files' data.
