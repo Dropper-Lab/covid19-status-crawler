@@ -82,7 +82,7 @@ def dump_result(uid, data):
     logger.info('dump_result: function ended')
 
 
-def get_status_data(target=''):
+def get_status_data(target='', current_timestamp=0):
     logger.info('get_status_data: function started | target=' + target)
 
     downloaded_html = urlopen(target)
@@ -136,34 +136,119 @@ def get_status_data(target=''):
     }
     logger.info('get_status_data: declare region_dictionary | region_dictionary=' + str(region_dictionary))
 
-    for table_data in table_data_rows:
-        logger.info('get_status_data: extracting table data | table_data=' + str(table_data))
-        table_data_beautifulsoup_object = BeautifulSoup(str(table_data), 'html.parser')
-        logger.info(
-            'get_status_data: convert table_data to beautifulsoup object | table_data_beautifulsoup_object=' + str(
-                table_data_beautifulsoup_object))
+    convert_error_list = [0]
+    database_error_list = [0]
+    dictionary_error_list = [0]
 
-        region = region_dictionary[table_data_beautifulsoup_object.findAll('th')[0].text]
-        logger.info('get_status_data: extracting region from table data | region=' + str(region))
-        data = table_data_beautifulsoup_object.findAll('td')
-        logger.info('get_status_data: extracting data from table data | data=' + str(data))
+    report_message = '* Dropper API Status Crawling Report *\n\n\n'
+    report_level = 0
 
-        status_data = {
-            'region': region,
-            'increased': int('0' + re.sub('[^0-9]', '', data[0].text)),
-            'increased_foreign': int('0' + re.sub('[^0-9]', '', data[1].text)),
-            'increased_local': int('0' + re.sub('[^0-9]', '', data[2].text)),
-            'certified': int('0' + re.sub('[^0-9]', '', data[3].text)),
-            'isolated': int('0' + re.sub('[^0-9]', '', data[4].text)),
-            'unisolated': int('0' + re.sub('[^0-9]', '', data[5].text)),
-            'dead': int('0' + re.sub('[^0-9]', '', data[6].text)),
-            'percentage': float('0' + re.sub('[^0-9.]', '', data[7].text))
-        }
-        logger.info('get_status_data: declare status data | status_data=' + str(status_data))
+    if len(table_data_rows) == 0:
+        if report_level < 3:
+            report_level = 3
+        logger.info('get_status_data: table_data_rows is empty')
+        report_message += '- FATAL: table_data_rows is empty -\n\n\n'
+        report_message += '\n'
+        report_message += '\nThis report is about table_data_rows ' + str(table_data_rows)
+        report_message += '\n'
+        report_message += '\n\n\n\n\n'
+    else:
+        for table_data, index_no in zip(table_data_rows, range(len(table_data_rows))):
+            try:
+                logger.info('get_status_data: extracting table data | table_data=' + str(table_data))
+                table_data_beautifulsoup_object = BeautifulSoup(str(table_data), 'html.parser')
+                logger.info(
+                    'get_status_data: convert table_data to beautifulsoup object | table_data_beautifulsoup_object=' + str(
+                        table_data_beautifulsoup_object))
+                try:
+                    region = table_data_beautifulsoup_object.findAll('th')[0].text
+                    logger.info('get_status_data: extracting region from table data | region=' + str(region))
+                    data = table_data_beautifulsoup_object.findAll('td')
+                    logger.info('get_status_data: extracting data from table data | data=' + str(data))
+                    try:
+                        status_data = {
+                            'region': region_dictionary[region],
+                            'increased': int('0' + re.sub('[^0-9]', '', data[0].text)),
+                            'increased_foreign': int('0' + re.sub('[^0-9]', '', data[1].text)),
+                            'increased_local': int('0' + re.sub('[^0-9]', '', data[2].text)),
+                            'certified': int('0' + re.sub('[^0-9]', '', data[3].text)),
+                            'isolated': int('0' + re.sub('[^0-9]', '', data[4].text)),
+                            'unisolated': int('0' + re.sub('[^0-9]', '', data[5].text)),
+                            'dead': int('0' + re.sub('[^0-9]', '', data[6].text)),
+                            'percentage': float('0' + re.sub('[^0-9.]', '', data[7].text))
+                        }
+                        logger.info('get_status_data: declare status data | status_data=' + str(status_data))
 
-        status_data_list.append(status_data)
-        logger.info(
-            'get_status_data: put status data into status data list | status_data_list=' + str(status_data_list))
+                        status_data_list.append(status_data)
+                        logger.info(
+                            'get_status_data: put status data into status data list | status_data_list=' + str(status_data_list))
+                    except Exception as ex:
+                        if report_level < 1:
+                            report_level = 1
+                        dictionary_error_list[0] = 1
+                        dictionary_error_list.append([ex, table_data])
+                        logger.info('get_status_data: unregistered region name was found | ex=' + str(
+                            ex) + ' | dictionary_error_list=' + str(dictionary_error_list))
+                except Exception as ex:
+                    if report_level < 2:
+                        report_level = 2
+                    database_error_list[0] = 1
+                    database_error_list.append([ex, index_no])
+                    logger.info('get_status_data: cannot extract region or data from table data | ex=' + str(ex) + ' | index_no=' + str(index_no))
+            except Exception as ex:
+                if report_level < 2:
+                    report_level = 2
+                convert_error_list[0] = 1
+                convert_error_list.append([ex, table_data])
+                logger.info('get_status_data: cannot convert table_data to beautifulsoup object | ex=' + str(ex) + ' | table_data=' + str(table_data))
+
+    if convert_error_list[0] == 1:
+        report_message += '- ERROR: cannot convert table_data to beautifulsoup object -\n\n\n'
+        for error in convert_error_list[1:]:
+            report_message += '---------------------------\n'
+            report_message += f"{error[0]}\n\ntable_data:\n{error[1]}\n"
+        report_message += '---------------------------\n'
+        report_message += '\n\n\n\n\n'
+
+    if database_error_list[0] == 1:
+        report_message += '- ERROR: cannot extract region from table data -\n\n\n'
+        for error in database_error_list[1:]:
+            report_message += '---------------------------\n'
+            report_message += f"{error[0]}\n\nindex_no:\n{error[1]}\n"
+        report_message += '---------------------------\n'
+        report_message += '\n\n\n\n\n'
+
+    if dictionary_error_list[0] == 1:
+        report_message += '- WARN: unregistered region name was found -\n\n\n'
+        for error in dictionary_error_list[1:]:
+            report_message += '---------------------------\n'
+            report_message += f"{error[0]}\n\nregion_name:\n{error[1]}\n"
+        report_message += '---------------------------\n'
+        report_message += '\n\n\n\n\n'
+
+    if report_level < 2:
+        report_message += 'Crawling finished successfully\n'
+        report_message += '\nThis report is based on (Unix Time)' + str(int(current_timestamp))
+        if report_level == 0:
+            mail_sender.send_mail(
+                subject=f'[Dropper API](status_crawler) INFO: task report',
+                message=report_message)
+        elif report_level == 1:
+            mail_sender.send_mail(
+                subject=f'[Dropper API](status_crawler) WARN: task report',
+                message=report_message)
+    elif report_level == 2:
+        report_message += 'Some error occurred while crawling\n'
+        report_message += '\nThis report is based on (Unix Time)' + str(int(current_timestamp))
+        mail_sender.send_mail(
+            subject=f'[Dropper API](status_crawler) ERROR: task report',
+            message=report_message)
+    else:
+        report_message += 'Fatal error occurred while crawling\n'
+        report_message += '\nThis report is based on (Unix Time)' + str(int(current_timestamp))
+        mail_sender.send_mail(
+            subject=f'[Dropper API](status_crawler) FATAL: task report',
+            message=report_message)
 
     logger.info('get_status_data: function ended | status_data_list=' + str(status_data_list))
     return status_data_list
@@ -175,7 +260,7 @@ if __name__ == '__main__':
     timestamp = int(time.time())
     logger.info('recorded a time stamp | timestamp=' + str(timestamp))
 
-    result = get_status_data(target='http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13')
+    result = get_status_data(target='http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13', current_timestamp=timestamp)
     logger.info('get result | result=' + str(result))
 
     dump_result(timestamp, result)
