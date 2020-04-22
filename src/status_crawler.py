@@ -49,7 +49,11 @@ logger.addHandler(fileHandler)
 logger.setLevel(logging.INFO)
 logger.info('every package loaded and start logging')
 
-logger.info('mysql_status_property.hostname=' + str(mysql_status_property.hostname) + ' | mysql_status_property.user=' + str(mysql_status_property.user) + ' | mysql_status_property.password=' + str(mysql_status_property.password) + ' | mysql_status_property.database=' + str(mysql_status_property.database) + ' | mysql_status_property.charset=' + str(mysql_status_property.charset))
+logger.info(
+    'mysql_status_property.hostname=' + str(mysql_status_property.hostname) + ' | mysql_status_property.user=' + str(
+        mysql_status_property.user) + ' | mysql_status_property.password=' + str(
+        mysql_status_property.password) + ' | mysql_status_property.database=' + str(
+        mysql_status_property.database) + ' | mysql_status_property.charset=' + str(mysql_status_property.charset))
 logger.info('status_property.region_dictionary=' + str(status_property.region_dictionary))
 
 
@@ -163,7 +167,8 @@ def get_status_data(target='', current_timestamp=0):
 
                         status_data_list.append(status_data)
                         logger.info(
-                            'get_status_data: put status data into status data list | status_data_list=' + str(status_data_list))
+                            'get_status_data: put status data into status data list | status_data_list=' + str(
+                                status_data_list))
                     except Exception as ex:
                         if report_level < 1:
                             report_level = 1
@@ -176,13 +181,15 @@ def get_status_data(target='', current_timestamp=0):
                         report_level = 2
                     database_error_list[0] = 1
                     database_error_list.append([ex, index_no])
-                    logger.info('get_status_data: cannot extract region or data from table data | ex=' + str(ex) + ' | index_no=' + str(index_no))
+                    logger.info('get_status_data: cannot extract region or data from table data | ex=' + str(
+                        ex) + ' | index_no=' + str(index_no))
             except Exception as ex:
                 if report_level < 2:
                     report_level = 2
                 convert_error_list[0] = 1
                 convert_error_list.append([ex, table_data])
-                logger.info('get_status_data: cannot convert table_data to beautifulsoup object | ex=' + str(ex) + ' | table_data=' + str(table_data))
+                logger.info('get_status_data: cannot convert table_data to beautifulsoup object | ex=' + str(
+                    ex) + ' | table_data=' + str(table_data))
 
     if convert_error_list[0] == 1:
         report_message += '- ERROR: cannot convert table_data to beautifulsoup object -\n\n\n'
@@ -242,7 +249,8 @@ if __name__ == '__main__':
     timestamp = int(time.time())
     logger.info('recorded a time stamp | timestamp=' + str(timestamp))
 
-    result = get_status_data(target='http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13', current_timestamp=timestamp)
+    result = get_status_data(target='http://ncov.mohw.go.kr/bdBoardList_Real.do?brdId=1&brdGubun=13',
+                             current_timestamp=timestamp)
     logger.info('get result | result=' + str(result))
 
     dump_result(timestamp, result)
