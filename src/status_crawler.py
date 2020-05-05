@@ -153,7 +153,7 @@ def get_status_data(target='', current_timestamp=0):
                     logger.info('get_status_data: extracting data from table data | data=' + str(data))
                     try:
                         status_data = {
-                            'region': status_property.region_dictionary[re.sub('[가-힣]^', '', region)],
+                            'region': status_property.region_dictionary[re.sub('[  ]', '', re.sub('[가-힣]^', '', region))],
                             'increased': int('0' + re.sub('[^0-9]', '', data[0].text)),
                             'increased_foreign': int('0' + re.sub('[^0-9]', '', data[1].text)),
                             'increased_local': int('0' + re.sub('[^0-9]', '', data[2].text)),
