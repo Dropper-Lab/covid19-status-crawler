@@ -16,3 +16,6 @@ The status data crawler for COVID19API from Dropper-Lab. with python (Data from 
 
 ### v1.0.3
 - Modify region name purifier.
+
+### v1.0.4
+- Modify region name purifier for whitespaces.
