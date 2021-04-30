@@ -1,5 +1,5 @@
 jaraco.logging==3.0.0
-urllib3==1.25.6
+urllib3==1.25.8
 beautifulsoup4==4.8.1
 PyMySQL==0.9.3
 requests==2.23.0
